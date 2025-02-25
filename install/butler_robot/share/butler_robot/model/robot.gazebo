@@ -1,0 +1,90 @@
+<?xml version="1.0"?>
+
+<!-- frictional coefficients-->
+<robot>
+
+<gazebo reference='body_link'>
+<mu1>0.2</mu1>
+<mu2>0.2</mu2>
+<material>Gazebo/Grey</material>
+</gazebo>
+
+<gazebo reference='front_wheel1_link'>
+<mu1>0.2</mu1>
+<mu2>0.2</mu2>
+<material>Gazebo/Black</material>
+</gazebo>
+
+<gazebo reference = 'rear_wheel1_link'>
+<mu1>0.2</mu1>
+<mu2>0.2</mu2>
+<material>Gazebo/Black</material>
+</gazebo>
+
+<gazebo reference='front_wheel2_link'>
+<mu1>0.2</mu1>
+<mu2>0.2</mu2>
+<material>Gazebo/Black</material>
+</gazebo>
+
+<gazebo reference = 'rear_wheel2_link'>
+<mu1>0.2</mu1>
+<mu2>0.2</mu2>
+<material>Gazebo/Black</material>
+</gazebo>
+
+<gazebo reference = 'head_link'>
+<mu1>0.2</mu1>
+<mu2>0.2</mu2>
+<material>Gazebo/White</material>
+</gazebo>
+
+<gazebo reference = 'camera_frame'>
+<mu1>0.2</mu1>
+<mu2>0.2</mu2>
+<material>Gazebo/Black</material>
+</gazebo>
+
+<gazebo reference = 'base_scan'>
+<mu1>0.2</mu1>
+<mu2>0.2</mu2>
+<material>Gazebo/Black</material>
+</gazebo>
+
+
+<gazebo>
+    <plugin name = 'diff_drive' filename = 'libgazebo_ros_diff_drive.so'>
+        <ros>
+            <namespace></namespace>
+        </ros>
+
+        <!-- Number of Wheel pairs-->
+        <num_wheel_pairs>2</num_wheel_pairs>
+
+        <!-- Wheels-->
+        <left_joint>front_wheel2_joint</left_joint>
+        <right_joint>front_wheel1_joint</right_joint>
+        <left_joint>rear_wheel2_joint</left_joint>
+        <right_joint>rear_wheel1_joint</right_joint>
+
+        <!-- Kinematics-->
+        <wheel_separation>${body_link_y_dim+wheel_link_length}</wheel_separation>
+        
+        <wheel_diameter>${2*wheel_link_radius}</wheel_diameter>
+
+        <!-- limits-->
+        <max_wheel_torque>5000</max_wheel_torque>
+        <max_wheel_acceleration>7.0</max_wheel_acceleration>
+
+        <!-- Output-->
+        <publish_odom>true</publish_odom>
+        <publish_odom_tf>true</publish_odom_tf>
+        <publish_wheel_tf>true</publish_wheel_tf>
+
+        <odometry_frame>odom</odometry_frame>
+        <robot_base_frame>base_footprint</robot_base_frame>
+
+    </plugin>
+</gazebo>
+
+</robot>

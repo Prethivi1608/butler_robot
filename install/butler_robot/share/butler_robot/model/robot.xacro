@@ -1,0 +1,338 @@
+<?xml version="1.0"?>
+
+<robot name="butler_robot" xmlns:xacro = "http://www.ros.org/wiki/xacro">
+
+<!-- Body Dimensions-->
+<xacro:property name="body_link_x_dim" value="0.4"/>
+<xacro:property name="body_link_y_dim" value="0.3"/>
+<xacro:property name="body_link_z_dim" value="0.6"/>
+
+<!-- Wheel Dimensions-->
+<xacro:property name="wheel_link_radius" value="0.10"/>
+<xacro:property name="wheel_link_length" value="0.1"/>
+<xacro:property name="wheel_link_z_location" value="-0.30"/>
+
+<!-- Head Dimensions-->
+<xacro:property name="head_link_radius" value="0.15"/>
+<xacro:property name="head_link_z_location" value="0.40"/>
+
+<!-- Plate Dimensions-->
+<xacro:property name="plate_link_x_dim" value="0.15"/>
+<xacro:property name="plate_link_y_dim" value="1.0"/>
+<xacro:property name="plate_link_z_dim" value="0.4"/>
+<xacro:property name="plate_link_z_location" value="1.5"/>
+
+<!-- Material Density-->
+<xacro:property name="body_density" value="2710.0"/>
+<xacro:property name="wheel_density" value="2710.0"/>
+<xacro:property name="head_density" value="2710.0"/>
+<xacro:property name="plate_density" value="2710.0"/>
+
+<!-- Standard Pi Constant-->
+<xacro:property name="pi_const" value="3.14159265"/>
+
+<!-- Mass of the robot-->
+<xacro:property name="body_mass" value="${body_density*body_link_x_dim*body_link_y_dim*body_link_z_dim}"/>
+<xacro:property name="plate_mass" value="${plate_density*plate_link_x_dim*plate_link_y_dim*plate_link_z_dim}"/>
+<xacro:property name="wheel_mass" value="${wheel_density*pi_const*wheel_link_radius*wheel_link_length}"/>
+<xacro:property name="head_mass" value="${head_density*(4.0/3.0)*pi_const*head_link_radius*head_link_radius*head_link_radius}"/>
+
+<!-- Moment of Inertia Wheel -->
+<xacro:property name="Iz_wheel" value="${0.5*wheel_mass*wheel_link_radius*wheel_link_radius}"/>
+<xacro:property name="I_wheel" value="${(1.0/12.0)*wheel_mass*(3.0*wheel_link_radius*wheel_link_radius+wheel_link_length*wheel_link_length)}"/>
+
+<!-- Moment of head -->
+<xacro:property name="I_head" value="${(2.0/5.0)*head_mass*head_link_radius*head_link_radius}"/>
+
+<!-- Interial section of wheel-->
+<xacro:macro name = "inertal_wheel">
+    <inertial>
+    <origin rpy = "0 0 0" xyz = "0 0 0"/>
+    <mass value = "${wheel_mass}"/>
+    <inertia ixx = "${I_wheel}" ixy="0.0" ixz = '0.0' iyy="${I_wheel}" iyz="0.0" izz="${Iz_wheel}"/>
+    </inertial>
+</xacro:macro>
+
+<!-- Interial section of head-->
+<xacro:macro name = "inertal_head">
+    <inertial>
+    <origin rpy = "0 0 0" xyz = "0 0 0"/>
+    <mass value = "${head_mass}"/>
+    <inertia ixx = "${I_head}" ixy="0.0" ixz = '0.0' iyy="${I_head}" iyz="0.0" izz="${I_head}"/>
+    </inertial>
+</xacro:macro>
+
+<!-- Include a file defining the Gazebo options and motion control driver-->
+<xacro:include filename="$(find butler_robot)/model/robot.gazebo"/>
+
+<!-- A dummy link and Joint-->
+<link name="base_footprint"/>
+
+  <joint name="base_joint" type="fixed">
+    <parent link="base_footprint"/>
+    <child link="body_link" />
+    <origin xyz="0 0 0.010" rpy="0 0 0"/>
+  </joint>
+
+<!-- Body Link-->
+<link name = 'body_link'>
+    <visual>
+        <geometry>
+            <box size = "${body_link_x_dim} ${body_link_y_dim} ${body_link_z_dim}"/>
+        </geometry>
+    <orgin rpy = "0 0 0" xyz = "0 0 0"/>
+    </visual>
+    <collision>
+        <geometry>
+            <box size = "${body_link_x_dim} ${body_link_y_dim} ${body_link_z_dim}"/>
+        </geometry>
+    <orgin rpy = "0 0 0" xyz = "0 0 0"/>
+    </collision>
+
+    <inertial>
+        <orgin rpy = "0 0 0" xyz = "0 0 0"/>
+        <mass value = "${body_mass}"/>
+        <inertia 
+        ixx = "${(1/12)*body_mass*(body_link_y_dim*body_link_y_dim+body_link_z_dim*body_link_z_dim)}" ixy="0"  ixz="0"  iyz="0"
+        iyy = "${(1/12)*body_mass*(body_link_x_dim*body_link_x_dim+body_link_z_dim*body_link_z_dim)}"
+        izz = "${(1/12)*body_mass*(body_link_y_dim*body_link_y_dim+body_link_x_dim*body_link_x_dim)}"/>
+    </inertial>
+</link>
+
+
+<!--Front Right Wheel-->
+<joint name = "front_wheel1_joint" type = "continuous">
+    <parent link = "body_link"/>
+    <child link = "front_wheel1_link"/>
+    <origin xyz = "${2*wheel_link_radius} ${-2*wheel_link_length} ${wheel_link_z_location}" rpy = "0 0 0"/>
+    <axis xyz = "0 1 0"/>
+    <limit effort = "1000" velocity = "1000"/>
+    <dynamics damping = "1.0" friction = "1.0"/>
+</joint>
+
+<link name = "front_wheel1_link">
+    <visual>
+        <origin rpy = "1.570795 0 0" xyz = "0 0 0"/> 
+        <geometry>
+        <cylinder radius = "${wheel_link_radius}" length = "${wheel_link_length}"/>
+        </geometry> 
+    </visual>
+    <collision>
+        <origin rpy = "1.570795 0 0" xyz = "0 0 0"/> 
+        <geometry>
+        <cylinder radius = "${wheel_link_radius}" length = "${wheel_link_length}"/>
+        </geometry> 
+    </collision>
+
+    <xacro:inertal_wheel />
+</link>
+
+<!--Rear Right Wheel-->
+<joint name = "rear_wheel1_joint" type = "continuous">
+    <parent link = "body_link"/>
+    <child link = "rear_wheel1_link"/>
+    <origin xyz = "${-2*wheel_link_radius} ${-2*wheel_link_length} ${wheel_link_z_location}" rpy = "0 0 0"/>
+    <axis xyz = "0 1 0"/>
+    <limit effort = "1000" velocity = "1000"/>
+    <dynamics damping = "1.0" friction = "1.0"/>
+</joint>
+
+<link name = "rear_wheel1_link">
+    <visual>
+        <origin rpy = "1.570795 0 0" xyz = "0 0 0"/> 
+        <geometry>
+        <cylinder radius = "${wheel_link_radius}" length = "${wheel_link_length}"/>
+        </geometry> 
+    </visual>
+    <collision>
+        <origin rpy = "1.570795 0 0" xyz = "0 0 0"/> 
+        <geometry>
+        <cylinder radius = "${wheel_link_radius}" length = "${wheel_link_length}"/>
+        </geometry> 
+    </collision>
+
+    <xacro:inertal_wheel />
+</link>
+
+<!--Front left Wheel-->
+<joint name = "front_wheel2_joint" type = "continuous">
+    <parent link = "body_link"/>
+    <child link = "front_wheel2_link"/>
+    <origin xyz = "${2*wheel_link_radius} ${2*wheel_link_length} ${wheel_link_z_location}" rpy = "0 0 0"/>
+    <axis xyz = "0 1 0"/>
+    <limit effort = "1000" velocity = "1000"/>
+    <dynamics damping = "1.0" friction = "1.0"/>
+</joint>
+
+<link name = "front_wheel2_link">
+    <visual>
+        <origin rpy = "1.570795 0 0" xyz = "0 0 0"/> 
+        <geometry>
+        <cylinder radius = "${wheel_link_radius}" length = "${wheel_link_length}"/>
+        </geometry> 
+    </visual>
+    <collision>
+        <origin rpy = "1.570795 0 0" xyz = "0 0 0"/> 
+        <geometry>
+        <cylinder radius = "${wheel_link_radius}" length = "${wheel_link_length}"/>
+        </geometry> 
+    </collision>
+
+    <xacro:inertal_wheel />
+</link>
+
+<!--Rear Left Wheel-->
+<joint name = "rear_wheel2_joint" type = "continuous">
+    <parent link = "body_link"/>
+    <child link = "rear_wheel2_link"/>
+    <origin xyz = "${-2*wheel_link_radius} ${2*wheel_link_length} ${wheel_link_z_location}" rpy = "0 0 0"/>
+    <axis xyz = "0 1 0"/>
+    <limit effort = "1000" velocity = "1000"/>
+    <dynamics damping = "1.0" friction = "1.0"/>
+</joint>
+
+<link name = "rear_wheel2_link">
+    <visual>
+        <origin rpy = "1.570795 0 0" xyz = "0 0 0"/> 
+        <geometry>
+        <cylinder radius = "${wheel_link_radius}" length = "${wheel_link_length}"/>
+        </geometry> 
+    </visual>
+    <collision>
+        <origin rpy = "1.570795 0 0" xyz = "0 0 0"/> 
+        <geometry>
+        <cylinder radius = "${wheel_link_radius}" length = "${wheel_link_length}"/>
+        </geometry> 
+    </collision>
+
+    <xacro:inertal_wheel />
+</link>
+
+<!-- Head -->
+<joint name = "head_joint" type = "fixed">
+    <parent link = "body_link"/>
+    <child link = "head_link"/>
+    <origin xyz = "0 0 ${head_link_z_location}" rpy = "0 0 0"/>
+</joint>
+
+<link name = "head_link">
+    <visual>
+        <origin rpy = "0 0 0" xyz = "0 0 0"/> 
+        <geometry>
+        <sphere radius = "${head_link_radius}"/>
+        </geometry> 
+    </visual>
+    <collision>
+        <origin rpy = "0 0 0" xyz = "0 0 0"/> 
+        <geometry>
+        <sphere radius = "${head_link_radius}"/>
+        </geometry> 
+    </collision>
+
+    <xacro:inertal_head/> 
+</link>
+
+<!-- Lidar Frame-->
+<joint name = "lidar_joint" type = "fixed">
+    <parent link = "head_link"/>
+    <child link = "base_scan"/>
+    <origin xyz = "${-head_link_radius/6} 0 ${head_link_radius}" rpy = "0 0 0"/>
+</joint>
+
+<link name = "base_scan">
+    <visual>
+        <origin rpy = "0 0 0" xyz = "0 0 0"/> 
+        <geometry>
+        <sphere radius = "0.01"/>
+        </geometry> 
+    </visual>
+    <collision>
+        <origin rpy = "0 0 0" xyz = "0 0 0"/> 
+        <geometry>
+        <sphere radius = "0.01"/>
+        </geometry> 
+    </collision>
+    <xacro:inertal_head/> 
+</link>
+
+<!-- Lidar Sensor -->
+<gazebo reference = 'base_scan'>
+    <sensor type='ray' name='lidar_sensor'>
+        <pose>0 0 0 0 0 0</pose>
+        <visualize>true</visualize>
+        <update_rate>10</update_rate>
+        <ray>
+            <scan>
+                <horizontal>
+                    <samples>320</samples>
+                    <resolution>1</resolution>
+                    <min_angle>-3.14</min_angle>
+                    <max_angle>3.14</max_angle>
+                </horizontal>
+            </scan>
+            <range>
+                <min>0.3</min>
+                <max>15</max>
+                <resolution>0.01</resolution>
+            </range>
+        </ray>
+        <plugin name="laser_scan" filename="libgazebo_ros_ray_sensor.so">
+          <ros>
+            <!-- <namespace>/tb3</namespace> -->
+            <remapping>~/out:=scan</remapping>
+          </ros>
+          <output_type>sensor_msgs/LaserScan</output_type>
+          <frame_name>base_scan</frame_name>
+        </plugin>
+    </sensor>
+</gazebo>
+
+<!-- Camera Frame-->
+<joint name = "camera_joint" type = "fixed">
+    <parent link = "head_link"/>
+    <child link = "camera_frame"/>
+    <origin xyz = "${head_link_radius} 0 0" rpy = "0 0 0"/>
+</joint>
+
+<link name = "camera_frame">
+    <visual>
+        <origin rpy = "0 0 0" xyz = "0 0 0"/> 
+        <geometry>
+        <sphere radius = "0.01"/>
+        </geometry> 
+    </visual>
+    <collision>
+        <origin rpy = "0 0 0" xyz = "0 0 0"/> 
+        <geometry>
+        <sphere radius = "0.01"/>
+        </geometry> 
+    </collision>
+    <xacro:inertal_head/> 
+</link>
+
+<!-- Camera Sensor -->
+<gazebo reference = 'camera_frame'>
+<sensor name = "camera" type="camera">
+    <pose> 0.5 0 0.25 0 0.7 1.9707</pose>
+    <visualize>true</visualize>
+    <update_rate>5</update_rate>
+    <camera>
+        <horizontal_fov>1</horizontal_fov>
+        <image>
+            <format>R8G8B8</format>
+            <width>640</width>
+            <height>480</height>
+        </image>
+        <clip>
+            <near>0.05</near>
+            <far>1000</far>
+        </clip>
+    </camera>
+    <plugin name = "camera_controller" filename = "libgazebo_ros_camera.so">
+        <frame_name>camera_frame</frame_name>
+    </plugin>
+</sensor>
+</gazebo>
+
+
+</robot>

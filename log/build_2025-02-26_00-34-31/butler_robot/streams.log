@@ -1,0 +1,24 @@
+[0.325s] Invoking command in '/home/prethiviraj/butler_robot/src/butler_robot': PYTHONPATH=/home/prethiviraj/butler_robot/build/butler_robot/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/prethiviraj/butler_robot/install/butler_robot/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/butler_robot build --build-base /home/prethiviraj/butler_robot/build/butler_robot/build install --record /home/prethiviraj/butler_robot/build/butler_robot/install.log --single-version-externally-managed install_data
+[0.444s] running egg_info
+[0.444s] writing ../../build/butler_robot/butler_robot.egg-info/PKG-INFO
+[0.444s] writing dependency_links to ../../build/butler_robot/butler_robot.egg-info/dependency_links.txt
+[0.444s] writing entry points to ../../build/butler_robot/butler_robot.egg-info/entry_points.txt
+[0.444s] writing requirements to ../../build/butler_robot/butler_robot.egg-info/requires.txt
+[0.444s] writing top-level names to ../../build/butler_robot/butler_robot.egg-info/top_level.txt
+[0.445s] reading manifest file '../../build/butler_robot/butler_robot.egg-info/SOURCES.txt'
+[0.446s] writing manifest file '../../build/butler_robot/butler_robot.egg-info/SOURCES.txt'
+[0.446s] running build
+[0.446s] running build_py
+[0.446s] copying butler_robot/navigation.py -> /home/prethiviraj/butler_robot/build/butler_robot/build/lib/butler_robot
+[0.446s] running install
+[0.446s] running install_lib
+[0.447s] copying /home/prethiviraj/butler_robot/build/butler_robot/build/lib/butler_robot/navigation.py -> /home/prethiviraj/butler_robot/install/butler_robot/lib/python3.10/site-packages/butler_robot
+[0.447s] byte-compiling /home/prethiviraj/butler_robot/install/butler_robot/lib/python3.10/site-packages/butler_robot/navigation.py to navigation.cpython-310.pyc
+[0.448s] running install_data
+[0.448s] running install_egg_info
+[0.449s] removing '/home/prethiviraj/butler_robot/install/butler_robot/lib/python3.10/site-packages/butler_robot-0.0.0-py3.10.egg-info' (and everything under it)
+[0.449s] Copying ../../build/butler_robot/butler_robot.egg-info to /home/prethiviraj/butler_robot/install/butler_robot/lib/python3.10/site-packages/butler_robot-0.0.0-py3.10.egg-info
+[0.449s] running install_scripts
+[0.461s] Installing goal_publisher script to /home/prethiviraj/butler_robot/install/butler_robot/lib/butler_robot
+[0.461s] writing list of installed files to '/home/prethiviraj/butler_robot/build/butler_robot/install.log'
+[0.476s] Invoked command in '/home/prethiviraj/butler_robot/src/butler_robot' returned '0': PYTHONPATH=/home/prethiviraj/butler_robot/build/butler_robot/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/prethiviraj/butler_robot/install/butler_robot/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/butler_robot build --build-base /home/prethiviraj/butler_robot/build/butler_robot/build install --record /home/prethiviraj/butler_robot/build/butler_robot/install.log --single-version-externally-managed install_data

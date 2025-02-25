@@ -1,0 +1,4 @@
+[console_scripts]
+bt = butler_robot.bt:main
+goal_publisher = butler_robot.navigation:main
+
