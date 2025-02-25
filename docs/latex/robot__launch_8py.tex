@@ -1,0 +1,50 @@
+\hypertarget{robot__launch_8py}{}\doxysection{src/butler\+\_\+robot/launch/robot\+\_\+launch.py File Reference}
+\label{robot__launch_8py}\index{src/butler\_robot/launch/robot\_launch.py@{src/butler\_robot/launch/robot\_launch.py}}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+import launch from launch substitutions import \mbox{\hyperlink{navigation__launch_8py_a9397bdbd76c5197b655a9d8b6a277309}{Launch\+Configuration}} import launch\+\_\+ros import os def \mbox{\hyperlink{robot__launch_8py_a01b6cde38b5f3a5cf114bc2271f44dfc}{generate\+\_\+launch\+\_\+description}} ()
+\end{DoxyCompactItemize}
+\doxysubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+import launch from launch substitutions import \mbox{\hyperlink{robot__launch_8py_a8c241069ab5bd8d1137dd1a8289e2596}{Command}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{robot__launch_8py_a01b6cde38b5f3a5cf114bc2271f44dfc}\label{robot__launch_8py_a01b6cde38b5f3a5cf114bc2271f44dfc}} 
+\index{robot\_launch.py@{robot\_launch.py}!generate\_launch\_description@{generate\_launch\_description}}
+\index{generate\_launch\_description@{generate\_launch\_description}!robot\_launch.py@{robot\_launch.py}}
+\doxysubsubsection{\texorpdfstring{generate\_launch\_description()}{generate\_launch\_description()}}
+{\footnotesize\ttfamily import launch from launch substitutions import \mbox{\hyperlink{navigation__launch_8py_a9397bdbd76c5197b655a9d8b6a277309}{Launch\+Configuration}} import launch\+\_\+ros import os def generate\+\_\+launch\+\_\+description (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line 7 of file robot\+\_\+launch.\+py.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{7                                  :}
+\DoxyCodeLine{8     pkgPath = launch\_ros.substitutions.FindPackageShare(package=\textcolor{stringliteral}{'butler\_robot'}).find(\textcolor{stringliteral}{'butler\_robot'})}
+\DoxyCodeLine{9     urdfModelPath = os.path.join(pkgPath,\textcolor{stringliteral}{'model/robot.xacro'})}
+\DoxyCodeLine{10 }
+\DoxyCodeLine{11     with open(urdfModelPath,\textcolor{charliteral}{'r'}) as infp:}
+\DoxyCodeLine{12         robot\_desc = infp.read()}
+\DoxyCodeLine{13 }
+\DoxyCodeLine{14     params = \{\textcolor{stringliteral}{'robot\_description'}:robot\_desc\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Variable Documentation}
+\mbox{\Hypertarget{robot__launch_8py_a8c241069ab5bd8d1137dd1a8289e2596}\label{robot__launch_8py_a8c241069ab5bd8d1137dd1a8289e2596}} 
+\index{robot\_launch.py@{robot\_launch.py}!Command@{Command}}
+\index{Command@{Command}!robot\_launch.py@{robot\_launch.py}}
+\doxysubsubsection{\texorpdfstring{Command}{Command}}
+{\footnotesize\ttfamily import launch from launch substitutions import Command}
+
+
+
+Definition at line 2 of file robot\+\_\+launch.\+py.
+

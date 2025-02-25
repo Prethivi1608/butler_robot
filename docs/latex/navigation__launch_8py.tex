@@ -1,0 +1,113 @@
+\hypertarget{navigation__launch_8py}{}\doxysection{src/butler\+\_\+robot/launch/navigation\+\_\+launch.py File Reference}
+\label{navigation__launch_8py}\index{src/butler\_robot/launch/navigation\_launch.py@{src/butler\_robot/launch/navigation\_launch.py}}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+import os from ament\+\_\+index\+\_\+python packages import get\+\_\+package\+\_\+share\+\_\+directory from launch import Launch\+Description from launch actions import Set\+Environment\+Variable from launch conditions import If\+Condition from launch substitutions import Python\+Expression from launch\+\_\+ros actions import Load\+Composable\+Nodes from launch\+\_\+ros actions import Node from launch\+\_\+ros descriptions import Parameter\+File from nav2\+\_\+common launch import Rewritten\+Yaml def \mbox{\hyperlink{navigation__launch_8py_a5996c75f19494d315ea7aa7c3d0e9d7c}{generate\+\_\+launch\+\_\+description}} ()
+\end{DoxyCompactItemize}
+\doxysubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+import os from ament\+\_\+index\+\_\+python packages import get\+\_\+package\+\_\+share\+\_\+directory from launch import Launch\+Description from launch actions import \mbox{\hyperlink{navigation__launch_8py_aaf91d7025aeea2573074f726561b270e}{Declare\+Launch\+Argument}}
+\item 
+import os from ament\+\_\+index\+\_\+python packages import get\+\_\+package\+\_\+share\+\_\+directory from launch import Launch\+Description from launch actions import \mbox{\hyperlink{navigation__launch_8py_a0cec0388d139df5d4cbacfe2812dc438}{Group\+Action}}
+\item 
+import os from ament\+\_\+index\+\_\+python packages import get\+\_\+package\+\_\+share\+\_\+directory from launch import Launch\+Description from launch actions import Set\+Environment\+Variable from launch conditions import If\+Condition from launch substitutions import \mbox{\hyperlink{navigation__launch_8py_a9397bdbd76c5197b655a9d8b6a277309}{Launch\+Configuration}}
+\item 
+import os from ament\+\_\+index\+\_\+python packages import get\+\_\+package\+\_\+share\+\_\+directory from launch import Launch\+Description from launch actions import Set\+Environment\+Variable from launch conditions import If\+Condition from launch substitutions import Python\+Expression from launch\+\_\+ros actions import Load\+Composable\+Nodes from launch\+\_\+ros actions import Node from launch\+\_\+ros descriptions import \mbox{\hyperlink{navigation__launch_8py_a02833fd2f31cd6d27c7d7e9fa47cc6a9}{Composable\+Node}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{navigation__launch_8py_a5996c75f19494d315ea7aa7c3d0e9d7c}\label{navigation__launch_8py_a5996c75f19494d315ea7aa7c3d0e9d7c}} 
+\index{navigation\_launch.py@{navigation\_launch.py}!generate\_launch\_description@{generate\_launch\_description}}
+\index{generate\_launch\_description@{generate\_launch\_description}!navigation\_launch.py@{navigation\_launch.py}}
+\doxysubsubsection{\texorpdfstring{generate\_launch\_description()}{generate\_launch\_description()}}
+{\footnotesize\ttfamily import os from ament\+\_\+index\+\_\+python packages import get\+\_\+package\+\_\+share\+\_\+directory from launch import Launch\+Description from launch actions import Set\+Environment\+Variable from launch conditions import If\+Condition from launch substitutions import Python\+Expression from launch\+\_\+ros actions import Load\+Composable\+Nodes from launch\+\_\+ros actions import Node from launch\+\_\+ros descriptions import Parameter\+File from nav2\+\_\+common launch import Rewritten\+Yaml def generate\+\_\+launch\+\_\+description (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line 29 of file navigation\+\_\+launch.\+py.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{29                                  :}
+\DoxyCodeLine{30 \textcolor{preprocessor}{    \# Get the launch directory}}
+\DoxyCodeLine{31     bringup\_dir = get\_package\_share\_directory(\textcolor{stringliteral}{'butler\_robot'})}
+\DoxyCodeLine{32 }
+\DoxyCodeLine{33     namespace = \mbox{\hyperlink{navigation__launch_8py_a9397bdbd76c5197b655a9d8b6a277309}{LaunchConfiguration}}('namespace')}
+\DoxyCodeLine{34     use\_sim\_time = \mbox{\hyperlink{navigation__launch_8py_a9397bdbd76c5197b655a9d8b6a277309}{LaunchConfiguration}}('use\_sim\_time')}
+\DoxyCodeLine{35     autostart = \mbox{\hyperlink{navigation__launch_8py_a9397bdbd76c5197b655a9d8b6a277309}{LaunchConfiguration}}('autostart')}
+\DoxyCodeLine{36     params\_file = \mbox{\hyperlink{navigation__launch_8py_a9397bdbd76c5197b655a9d8b6a277309}{LaunchConfiguration}}('params\_file')}
+\DoxyCodeLine{37     use\_composition = \mbox{\hyperlink{navigation__launch_8py_a9397bdbd76c5197b655a9d8b6a277309}{LaunchConfiguration}}('use\_composition')}
+\DoxyCodeLine{38     container\_name = \mbox{\hyperlink{navigation__launch_8py_a9397bdbd76c5197b655a9d8b6a277309}{LaunchConfiguration}}('container\_name')}
+\DoxyCodeLine{39     container\_name\_full = (namespace, '/', container\_name)}
+\DoxyCodeLine{40     use\_respawn = \mbox{\hyperlink{navigation__launch_8py_a9397bdbd76c5197b655a9d8b6a277309}{LaunchConfiguration}}('use\_respawn')}
+\DoxyCodeLine{41     log\_level = \mbox{\hyperlink{navigation__launch_8py_a9397bdbd76c5197b655a9d8b6a277309}{LaunchConfiguration}}('log\_level')}
+\DoxyCodeLine{42 }
+\DoxyCodeLine{43     lifecycle\_nodes = ['controller\_server',}
+\DoxyCodeLine{44                        'smoother\_server',}
+\DoxyCodeLine{45                        'planner\_server',}
+\DoxyCodeLine{46                        'behavior\_server',}
+\DoxyCodeLine{47                        'bt\_navigator',}
+\DoxyCodeLine{48                        'waypoint\_follower',}
+\DoxyCodeLine{49                        'velocity\_smoother']}
+\DoxyCodeLine{50 }
+\DoxyCodeLine{51     \textcolor{preprocessor}{\# Map fully qualified names to relative ones so the node's namespace can be prepended.}}
+\DoxyCodeLine{52 \textcolor{preprocessor}{    \# In case of the transforms (tf), currently, there doesn't seem to be a better alternative}}
+\DoxyCodeLine{53 \textcolor{preprocessor}{    \# https:}\textcolor{comment}{//github.com/ros/geometry2/issues/32}}
+\DoxyCodeLine{54 \textcolor{preprocessor}{    \# https:}\textcolor{comment}{//github.com/ros/robot\_state\_publisher/pull/30}}
+\DoxyCodeLine{55 \textcolor{preprocessor}{    \# TODO(orduno) Substitute with `PushNodeRemapping`}}
+\DoxyCodeLine{56 \textcolor{preprocessor}{    \#              https:}\textcolor{comment}{//github.com/ros2/launch\_ros/issues/56}}
+\DoxyCodeLine{57     remappings = [(\textcolor{stringliteral}{'/tf'}, \textcolor{stringliteral}{'tf'}),}
+\DoxyCodeLine{58                   (\textcolor{stringliteral}{'/tf\_static'}, \textcolor{stringliteral}{'tf\_static'})]}
+\DoxyCodeLine{59 }
+\DoxyCodeLine{60 \textcolor{preprocessor}{    \# Create our own temporary YAML files that include substitutions}}
+\DoxyCodeLine{61     param\_substitutions = \{}
+\DoxyCodeLine{62         \textcolor{stringliteral}{'use\_sim\_time'}: use\_sim\_time,}
+\DoxyCodeLine{63         \textcolor{stringliteral}{'autostart'}: autostart\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Variable Documentation}
+\mbox{\Hypertarget{navigation__launch_8py_a02833fd2f31cd6d27c7d7e9fa47cc6a9}\label{navigation__launch_8py_a02833fd2f31cd6d27c7d7e9fa47cc6a9}} 
+\index{navigation\_launch.py@{navigation\_launch.py}!ComposableNode@{ComposableNode}}
+\index{ComposableNode@{ComposableNode}!navigation\_launch.py@{navigation\_launch.py}}
+\doxysubsubsection{\texorpdfstring{ComposableNode}{ComposableNode}}
+{\footnotesize\ttfamily import os from ament\+\_\+index\+\_\+python packages import get\+\_\+package\+\_\+share\+\_\+directory from launch import Launch\+Description from launch actions import Set\+Environment\+Variable from launch conditions import If\+Condition from launch substitutions import Python\+Expression from launch\+\_\+ros actions import Load\+Composable\+Nodes from launch\+\_\+ros actions import Node from launch\+\_\+ros descriptions import Composable\+Node}
+
+
+
+Definition at line 25 of file navigation\+\_\+launch.\+py.
+
+\mbox{\Hypertarget{navigation__launch_8py_aaf91d7025aeea2573074f726561b270e}\label{navigation__launch_8py_aaf91d7025aeea2573074f726561b270e}} 
+\index{navigation\_launch.py@{navigation\_launch.py}!DeclareLaunchArgument@{DeclareLaunchArgument}}
+\index{DeclareLaunchArgument@{DeclareLaunchArgument}!navigation\_launch.py@{navigation\_launch.py}}
+\doxysubsubsection{\texorpdfstring{DeclareLaunchArgument}{DeclareLaunchArgument}}
+{\footnotesize\ttfamily import os from ament\+\_\+index\+\_\+python packages import get\+\_\+package\+\_\+share\+\_\+directory from launch import Launch\+Description from launch actions import Declare\+Launch\+Argument}
+
+
+
+Definition at line 20 of file navigation\+\_\+launch.\+py.
+
+\mbox{\Hypertarget{navigation__launch_8py_a0cec0388d139df5d4cbacfe2812dc438}\label{navigation__launch_8py_a0cec0388d139df5d4cbacfe2812dc438}} 
+\index{navigation\_launch.py@{navigation\_launch.py}!GroupAction@{GroupAction}}
+\index{GroupAction@{GroupAction}!navigation\_launch.py@{navigation\_launch.py}}
+\doxysubsubsection{\texorpdfstring{GroupAction}{GroupAction}}
+{\footnotesize\ttfamily import os from ament\+\_\+index\+\_\+python packages import get\+\_\+package\+\_\+share\+\_\+directory from launch import Launch\+Description from launch actions import Group\+Action}
+
+
+
+Definition at line 20 of file navigation\+\_\+launch.\+py.
+
+\mbox{\Hypertarget{navigation__launch_8py_a9397bdbd76c5197b655a9d8b6a277309}\label{navigation__launch_8py_a9397bdbd76c5197b655a9d8b6a277309}} 
+\index{navigation\_launch.py@{navigation\_launch.py}!LaunchConfiguration@{LaunchConfiguration}}
+\index{LaunchConfiguration@{LaunchConfiguration}!navigation\_launch.py@{navigation\_launch.py}}
+\doxysubsubsection{\texorpdfstring{LaunchConfiguration}{LaunchConfiguration}}
+{\footnotesize\ttfamily import os from ament\+\_\+index\+\_\+python packages import get\+\_\+package\+\_\+share\+\_\+directory from launch import Launch\+Description from launch actions import Set\+Environment\+Variable from launch conditions import If\+Condition from launch substitutions import Launch\+Configuration}
+
+
+
+Definition at line 22 of file navigation\+\_\+launch.\+py.
+

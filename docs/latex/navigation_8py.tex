@@ -1,0 +1,288 @@
+\hypertarget{navigation_8py}{}\doxysection{src/butler\+\_\+robot/butler\+\_\+robot/navigation.py File Reference}
+\label{navigation_8py}\index{src/butler\_robot/butler\_robot/navigation.py@{src/butler\_robot/butler\_robot/navigation.py}}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+import rclpy from rclpy node import Node from visualization\+\_\+msgs msg import Marker\+Array from geometry\+\_\+msgs msg import Twist from std\+\_\+msgs msg import Color\+RGBA from nav\+\_\+msgs msg import Occupancy\+Grid import math import heapq from tf2\+\_\+ros import Transform\+Listener from geometry\+\_\+msgs msg import Transform\+Stamped class \mbox{\hyperlink{navigation_8py_acca34f89519543ff0c379804361ba4b3}{Marker\+Publisher}} (Node)
+\end{DoxyCompactItemize}
+\doxysubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+import rclpy from rclpy node import Node from visualization\+\_\+msgs msg import \mbox{\hyperlink{navigation_8py_a5b38a835d801e91f4ad6c42d25ee09af}{Marker}}
+\item 
+import rclpy from rclpy node import Node from visualization\+\_\+msgs msg import Marker\+Array from geometry\+\_\+msgs msg import \mbox{\hyperlink{navigation_8py_a7560f79a36d322ffccb5bae2df12dd10}{Pose}}
+\item 
+import rclpy from rclpy node import Node from visualization\+\_\+msgs msg import Marker\+Array from geometry\+\_\+msgs msg import \mbox{\hyperlink{navigation_8py_afb1846334569243a90894a2eabd6c93a}{Point}}
+\item 
+import rclpy from rclpy node import Node from visualization\+\_\+msgs msg import Marker\+Array from geometry\+\_\+msgs msg import Twist from std\+\_\+msgs msg import Color\+RGBA from nav\+\_\+msgs msg import Occupancy\+Grid import math import heapq from tf2\+\_\+ros import \mbox{\hyperlink{navigation_8py_a1bb42dd4981034c29be5b91bd43546d1}{Buffer}}
+\item 
+\mbox{\hyperlink{navigation_8py_abd2a69acd647fc87bf2b747f3afc03a8}{g\+\_\+score}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{navigation_8py_acca34f89519543ff0c379804361ba4b3}\label{navigation_8py_acca34f89519543ff0c379804361ba4b3}} 
+\index{navigation.py@{navigation.py}!MarkerPublisher@{MarkerPublisher}}
+\index{MarkerPublisher@{MarkerPublisher}!navigation.py@{navigation.py}}
+\doxysubsubsection{\texorpdfstring{MarkerPublisher()}{MarkerPublisher()}}
+{\footnotesize\ttfamily import rclpy from rclpy node import Node from visualization\+\_\+msgs msg import Marker\+Array from geometry\+\_\+msgs msg import Twist from std\+\_\+msgs msg import Color\+RGBA from nav\+\_\+msgs msg import Occupancy\+Grid import math import heapq from tf2\+\_\+ros import Transform\+Listener from geometry\+\_\+msgs msg import Transform\+Stamped class Marker\+Publisher (\begin{DoxyParamCaption}\item[{Node}]{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line 10 of file navigation.\+py.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{12                            :}
+\DoxyCodeLine{13     def \_\_init\_\_(\textcolor{keyword}{self}, goal\_x, goal\_y):}
+\DoxyCodeLine{14         super().\_\_init\_\_(\textcolor{stringliteral}{'marker\_publisher'})}
+\DoxyCodeLine{15         }
+\DoxyCodeLine{16         self.marker\_pub = self.create\_publisher(MarkerArray, \textcolor{stringliteral}{'/visualization\_marker\_array'}, 10)}
+\DoxyCodeLine{17         self.cmd\_vel\_pub = self.create\_publisher(Twist, \textcolor{stringliteral}{'/cmd\_vel'}, 10)}
+\DoxyCodeLine{18         self.timer = self.create\_timer(1.0, self.publish\_markers)}
+\DoxyCodeLine{19         self.map\_subscriber = self.create\_subscription(}
+\DoxyCodeLine{20             OccupancyGrid,}
+\DoxyCodeLine{21             \textcolor{stringliteral}{'/map'},}
+\DoxyCodeLine{22             self.map\_callback,}
+\DoxyCodeLine{23             10}
+\DoxyCodeLine{24         )}
+\DoxyCodeLine{25         }
+\DoxyCodeLine{26         \# TF listener for getting the robot\textcolor{stringliteral}{'s current position}}
+\DoxyCodeLine{27 \textcolor{stringliteral}{        self.tf\_buffer = Buffer()}}
+\DoxyCodeLine{28 \textcolor{stringliteral}{        self.tf\_listener = TransformListener(self.tf\_buffer, self)}}
+\DoxyCodeLine{29 \textcolor{stringliteral}{        }}
+\DoxyCodeLine{30 \textcolor{stringliteral}{        self.map\_data = None}}
+\DoxyCodeLine{31 \textcolor{stringliteral}{        self.get\_logger().info("{}Marker Publisher Node has been started."{})}}
+\DoxyCodeLine{32 \textcolor{stringliteral}{        }}
+\DoxyCodeLine{33 \textcolor{stringliteral}{        self.marker\_array = MarkerArray()}}
+\DoxyCodeLine{34 \textcolor{stringliteral}{        self.marker\_id = 0}}
+\DoxyCodeLine{35 \textcolor{stringliteral}{        self.spacing = 10.0}}
+\DoxyCodeLine{36 \textcolor{stringliteral}{        self.origin = None}}
+\DoxyCodeLine{37 \textcolor{stringliteral}{        self.resolution = None}}
+\DoxyCodeLine{38 \textcolor{stringliteral}{        self.marker\_positions = []}}
+\DoxyCodeLine{39 \textcolor{stringliteral}{        }}
+\DoxyCodeLine{40 \textcolor{stringliteral}{        self.unvisited = set()}}
+\DoxyCodeLine{41 \textcolor{stringliteral}{        self.visited = set()}}
+\DoxyCodeLine{42 \textcolor{stringliteral}{        self.path = set()}}
+\DoxyCodeLine{43 \textcolor{stringliteral}{        }}
+\DoxyCodeLine{44 \textcolor{stringliteral}{        self.start\_x = 0.0}}
+\DoxyCodeLine{45 \textcolor{stringliteral}{        self.start\_y = 0.0}}
+\DoxyCodeLine{46 \textcolor{stringliteral}{        }}
+\DoxyCodeLine{47 \textcolor{stringliteral}{        self.get\_initial\_robot\_position()}}
+\DoxyCodeLine{48 \textcolor{stringliteral}{        }}
+\DoxyCodeLine{49 \textcolor{stringliteral}{        \# Goal position in terms of x and y}}
+\DoxyCodeLine{50 \textcolor{stringliteral}{        self.goal\_x = goal\_x}}
+\DoxyCodeLine{51 \textcolor{stringliteral}{        self.goal\_y = goal\_y}}
+\DoxyCodeLine{52 \textcolor{stringliteral}{}}
+\DoxyCodeLine{53 \textcolor{stringliteral}{        self.start\_index = None}}
+\DoxyCodeLine{54 \textcolor{stringliteral}{        self.goal\_index = None}}
+\DoxyCodeLine{55 \textcolor{stringliteral}{}}
+\DoxyCodeLine{56 \textcolor{stringliteral}{        self.smoothened\_path = []}}
+\DoxyCodeLine{57 \textcolor{stringliteral}{    }}
+\DoxyCodeLine{58 \textcolor{stringliteral}{    def get\_initial\_robot\_position(self):}}
+\DoxyCodeLine{59 \textcolor{stringliteral}{        try:}}
+\DoxyCodeLine{60 \textcolor{stringliteral}{            transform = self.tf\_buffer.lookup\_transform('}map\textcolor{stringliteral}{', '}base\_footprint\textcolor{stringliteral}{', rclpy.time.Time())}}
+\DoxyCodeLine{61 \textcolor{stringliteral}{            }}
+\DoxyCodeLine{62 \textcolor{stringliteral}{            \# Extract the robot'}s position (x, y)}
+\DoxyCodeLine{63             self.start\_x = transform.transform.translation.x}
+\DoxyCodeLine{64             self.start\_y = transform.transform.translation.y}
+\DoxyCodeLine{65             }
+\DoxyCodeLine{66             self.get\_logger().info(f\textcolor{stringliteral}{"{}Initial Position: x=\{self.start\_x\}, y=\{self.start\_y\}"{}})}
+\DoxyCodeLine{67         except Exception as e:}
+\DoxyCodeLine{68             self.get\_logger().error(f\textcolor{stringliteral}{"{}Failed to get transform: \{str(e)\}"{}})}
+\DoxyCodeLine{69 }
+\DoxyCodeLine{70     def map\_callback(self, msg):}
+\DoxyCodeLine{71         self.map\_data = msg}
+\DoxyCodeLine{72         self.origin = self.map\_data.info.origin.position}
+\DoxyCodeLine{73         self.resolution = self.map\_data.info.resolution}
+\DoxyCodeLine{74         self.get\_logger().info(\textcolor{stringliteral}{"{}Received map data and origin."{}})}
+\DoxyCodeLine{75         }
+\DoxyCodeLine{76         \# Convert start and goal (x, y) positions to indices}
+\DoxyCodeLine{77         self.get\_robot\_position()}
+\DoxyCodeLine{78         self.start\_index = self.get\_index\_from\_position(self.start\_x, self.start\_y)}
+\DoxyCodeLine{79         self.goal\_index = self.get\_index\_from\_position(self.goal\_x, self.goal\_y)}
+\DoxyCodeLine{80 }
+\DoxyCodeLine{81     def get\_robot\_position(self):}
+\DoxyCodeLine{82         try:}
+\DoxyCodeLine{83             transform: TransformStamped = self.tf\_buffer.lookup\_transform(\textcolor{stringliteral}{'map'}, \textcolor{stringliteral}{'base\_footprint'}, rclpy.time.Time())}
+\DoxyCodeLine{84             }
+\DoxyCodeLine{85             \# Extract the robot\textcolor{stringliteral}{'s position in the map frame}}
+\DoxyCodeLine{86 \textcolor{stringliteral}{            self.start\_x = transform.transform.translation.x}}
+\DoxyCodeLine{87 \textcolor{stringliteral}{            self.start\_y = transform.transform.translation.y}}
+\DoxyCodeLine{88 \textcolor{stringliteral}{            }}
+\DoxyCodeLine{89 \textcolor{stringliteral}{            self.get\_logger().info(f"{}Robot'}s current position: (\{\textcolor{keyword}{self}.start\_x\}, \{\textcolor{keyword}{self}.start\_y\})\textcolor{stringliteral}{"{})}}
+\DoxyCodeLine{90 \textcolor{stringliteral}{            }}
+\DoxyCodeLine{91 \textcolor{stringliteral}{        except Exception as e:}}
+\DoxyCodeLine{92 \textcolor{stringliteral}{            self.get\_logger().error(f"{}}Could not get transform: \{e\}\textcolor{stringliteral}{"{})}}
+\DoxyCodeLine{93 \textcolor{stringliteral}{}}
+\DoxyCodeLine{94 \textcolor{stringliteral}{    def get\_index\_from\_position(self, x, y):}}
+\DoxyCodeLine{95 \textcolor{stringliteral}{        "{}}\textcolor{stringliteral}{"{}"{}}}
+\DoxyCodeLine{96         Convert x, y coordinates to the corresponding index in the grid.}
+\DoxyCodeLine{97         \textcolor{stringliteral}{"{}"{}}\textcolor{stringliteral}{"{}}}
+\DoxyCodeLine{98 \textcolor{stringliteral}{        i = int((x -\/ self.origin.x) / self.resolution / self.spacing)}}
+\DoxyCodeLine{99 \textcolor{stringliteral}{        j = int((y -\/ self.origin.y) / self.resolution / self.spacing)}}
+\DoxyCodeLine{100 \textcolor{stringliteral}{        index = j * 120 + i}}
+\DoxyCodeLine{101 \textcolor{stringliteral}{        return index}}
+\DoxyCodeLine{102 \textcolor{stringliteral}{}}
+\DoxyCodeLine{103 \textcolor{stringliteral}{    def create\_marker(self, marker\_id, pose, size=0.15, color=ColorRGBA(r=1.0, g=0.0, b=0.0, a=1.0)):}}
+\DoxyCodeLine{104 \textcolor{stringliteral}{        marker = Marker()}}
+\DoxyCodeLine{105 \textcolor{stringliteral}{        marker.header.frame\_id = "{}}map\textcolor{stringliteral}{"{}}}
+\DoxyCodeLine{106 \textcolor{stringliteral}{        marker.header.stamp = self.get\_clock().now().to\_msg()}}
+\DoxyCodeLine{107 \textcolor{stringliteral}{        marker.ns = "{}}markers\textcolor{stringliteral}{"{}}}
+\DoxyCodeLine{108 \textcolor{stringliteral}{        marker.id = marker\_id}}
+\DoxyCodeLine{109 \textcolor{stringliteral}{        marker.type = Marker.SPHERE}}
+\DoxyCodeLine{110 \textcolor{stringliteral}{        marker.action = Marker.ADD}}
+\DoxyCodeLine{111 \textcolor{stringliteral}{        marker.pose = pose}}
+\DoxyCodeLine{112 \textcolor{stringliteral}{        marker.scale.x = size}}
+\DoxyCodeLine{113 \textcolor{stringliteral}{        marker.scale.y = size}}
+\DoxyCodeLine{114 \textcolor{stringliteral}{        marker.scale.z = size}}
+\DoxyCodeLine{115 \textcolor{stringliteral}{        marker.color = color}}
+\DoxyCodeLine{116 \textcolor{stringliteral}{        return marker}}
+\DoxyCodeLine{117 \textcolor{stringliteral}{    }}
+\DoxyCodeLine{118 \textcolor{stringliteral}{    def create\_line\_marker(self, marker\_id, points, color=ColorRGBA(r=0.0, g=0.0, b=0.0, a=1.0)):}}
+\DoxyCodeLine{119 \textcolor{stringliteral}{        line\_marker = Marker()}}
+\DoxyCodeLine{120 \textcolor{stringliteral}{        line\_marker.header.frame\_id = "{}}map\textcolor{stringliteral}{"{}}}
+\DoxyCodeLine{121 \textcolor{stringliteral}{        line\_marker.header.stamp = self.get\_clock().now().to\_msg()}}
+\DoxyCodeLine{122 \textcolor{stringliteral}{        line\_marker.ns = "{}}lines\textcolor{stringliteral}{"{}}}
+\DoxyCodeLine{123 \textcolor{stringliteral}{        line\_marker.id = marker\_id}}
+\DoxyCodeLine{124 \textcolor{stringliteral}{        line\_marker.type = Marker.LINE\_LIST}}
+\DoxyCodeLine{125 \textcolor{stringliteral}{        line\_marker.action = Marker.ADD}}
+\DoxyCodeLine{126 \textcolor{stringliteral}{        line\_marker.scale.x = 0.05}}
+\DoxyCodeLine{127 \textcolor{stringliteral}{        line\_marker.color = color}}
+\DoxyCodeLine{128 \textcolor{stringliteral}{        }}
+\DoxyCodeLine{129 \textcolor{stringliteral}{        for p1, p2 in zip(points[:-\/1], points[1:]):}}
+\DoxyCodeLine{130 \textcolor{stringliteral}{            line\_marker.points.append(p1)}}
+\DoxyCodeLine{131 \textcolor{stringliteral}{            line\_marker.points.append(p2)}}
+\DoxyCodeLine{132 \textcolor{stringliteral}{        }}
+\DoxyCodeLine{133 \textcolor{stringliteral}{        return line\_marker}}
+\DoxyCodeLine{134 \textcolor{stringliteral}{    }}
+\DoxyCodeLine{135 \textcolor{stringliteral}{    def publish\_markers(self):}}
+\DoxyCodeLine{136 \textcolor{stringliteral}{        if not self.map\_data or self.origin is None or self.resolution is None:}}
+\DoxyCodeLine{137 \textcolor{stringliteral}{            self.get\_logger().info("{}}Waiting \textcolor{keywordflow}{for} map data and origin...\textcolor{stringliteral}{"{})}}
+\DoxyCodeLine{138 \textcolor{stringliteral}{            return}}
+\DoxyCodeLine{139 \textcolor{stringliteral}{        }}
+\DoxyCodeLine{140 \textcolor{stringliteral}{        self.marker\_array.markers.clear()}}
+\DoxyCodeLine{141 \textcolor{stringliteral}{        self.marker\_positions.clear()}}
+\DoxyCodeLine{142 \textcolor{stringliteral}{        self.unvisited.clear()}}
+\DoxyCodeLine{143 \textcolor{stringliteral}{        }}
+\DoxyCodeLine{144 \textcolor{stringliteral}{        marker\_id = 0}}
+\DoxyCodeLine{145 \textcolor{stringliteral}{        for i in range(120):}}
+\DoxyCodeLine{146 \textcolor{stringliteral}{            for j in range(75):}}
+\DoxyCodeLine{147 \textcolor{stringliteral}{                pose = Pose()}}
+\DoxyCodeLine{148 \textcolor{stringliteral}{                pose.position.x = self.origin.x + i * self.spacing * self.resolution}}
+\DoxyCodeLine{149 \textcolor{stringliteral}{                pose.position.y = self.origin.y + j * self.spacing * self.resolution}}
+\DoxyCodeLine{150 \textcolor{stringliteral}{                pose.position.z = 0.0}}
+\DoxyCodeLine{151 \textcolor{stringliteral}{                }}
+\DoxyCodeLine{152 \textcolor{stringliteral}{                self.marker\_positions.append(pose.position)}}
+\DoxyCodeLine{153 \textcolor{stringliteral}{                self.unvisited.add(marker\_id)}}
+\DoxyCodeLine{154 \textcolor{stringliteral}{                }}
+\DoxyCodeLine{155 \textcolor{stringliteral}{                if self.is\_obstacle(i, j):}}
+\DoxyCodeLine{156 \textcolor{stringliteral}{                    obstacle\_marker = self.create\_marker(marker\_id, pose, size=0.2, color=ColorRGBA(r=0.0, g=0.0, b=0.0, a=1.0))}}
+\DoxyCodeLine{157 \textcolor{stringliteral}{                    self.marker\_array.markers.append(obstacle\_marker)}}
+\DoxyCodeLine{158 \textcolor{stringliteral}{                else:}}
+\DoxyCodeLine{159 \textcolor{stringliteral}{                    marker = self.create\_marker(marker\_id, pose)}}
+\DoxyCodeLine{160 \textcolor{stringliteral}{                    self.marker\_array.markers.append(marker)}}
+\DoxyCodeLine{161 \textcolor{stringliteral}{                }}
+\DoxyCodeLine{162 \textcolor{stringliteral}{                marker\_id += 1}}
+\DoxyCodeLine{163 \textcolor{stringliteral}{        }}
+\DoxyCodeLine{164 \textcolor{stringliteral}{        line\_points = []}}
+\DoxyCodeLine{165 \textcolor{stringliteral}{        for i in range(120):}}
+\DoxyCodeLine{166 \textcolor{stringliteral}{            for j in range(75):}}
+\DoxyCodeLine{167 \textcolor{stringliteral}{                if i < 119:}}
+\DoxyCodeLine{168 \textcolor{stringliteral}{                    p1 = self.marker\_array.markers[i * 75 + j].pose.position}}
+\DoxyCodeLine{169 \textcolor{stringliteral}{                    p2 = self.marker\_array.markers[(i + 1) * 75 + j].pose.position}}
+\DoxyCodeLine{170 \textcolor{stringliteral}{                    line\_points.append(p1)}}
+\DoxyCodeLine{171 \textcolor{stringliteral}{                    line\_points.append(p2)}}
+\DoxyCodeLine{172 \textcolor{stringliteral}{                if j < 74:}}
+\DoxyCodeLine{173 \textcolor{stringliteral}{                    p1 = self.marker\_array.markers[i * 75 + j].pose.position}}
+\DoxyCodeLine{174 \textcolor{stringliteral}{                    p2 = self.marker\_array.markers[i * 75 + (j + 1)].pose.position}}
+\DoxyCodeLine{175 \textcolor{stringliteral}{                    line\_points.append(p1)}}
+\DoxyCodeLine{176 \textcolor{stringliteral}{                    line\_points.append(p2)}}
+\DoxyCodeLine{177 \textcolor{stringliteral}{        }}
+\DoxyCodeLine{178 \textcolor{stringliteral}{        line\_marker = self.create\_line\_marker(marker\_id, line\_points)}}
+\DoxyCodeLine{179 \textcolor{stringliteral}{        self.marker\_array.markers.append(line\_marker)}}
+\DoxyCodeLine{180 \textcolor{stringliteral}{        }}
+\DoxyCodeLine{181 \textcolor{stringliteral}{        self.a\_star\_algorithm()}}
+\DoxyCodeLine{182 \textcolor{stringliteral}{        self.marker\_pub.publish(self.marker\_array)}}
+\DoxyCodeLine{183 \textcolor{stringliteral}{        self.get\_logger().info(f"{}}Published \{len(\textcolor{keyword}{self}.marker\_array.markers)\}\textcolor{stringliteral}{"{})}}
+\DoxyCodeLine{184 \textcolor{stringliteral}{    }}
+\DoxyCodeLine{185 \textcolor{stringliteral}{    def is\_obstacle(self, i, j):}}
+\DoxyCodeLine{186 \textcolor{stringliteral}{}}
+\DoxyCodeLine{187 \textcolor{stringliteral}{        index = j * 120 + i}}
+\DoxyCodeLine{188 \textcolor{stringliteral}{        if self.map\_data.data[index] == 100:  \# Obstacle}}
+\DoxyCodeLine{189 \textcolor{stringliteral}{            return True}}
+\DoxyCodeLine{190 \textcolor{stringliteral}{        return False}}
+\DoxyCodeLine{191 \textcolor{stringliteral}{    }}
+\DoxyCodeLine{192 \textcolor{stringliteral}{    def heuristic(self, pos1, pos2):}}
+\DoxyCodeLine{193 \textcolor{stringliteral}{        return math.sqrt((pos1.x -\/ pos2.x) ** 2 + (pos1.y -\/ pos2.y) ** 2)}}
+\DoxyCodeLine{194 \textcolor{stringliteral}{    }}
+\DoxyCodeLine{195 \textcolor{stringliteral}{    def a\_star\_algorithm(self):}}
+\DoxyCodeLine{196 \textcolor{stringliteral}{        open\_set = [(0, self.start\_index)]}}
+\DoxyCodeLine{197 \textcolor{stringliteral}{        heapq.heapify(open\_set)}}
+\DoxyCodeLine{198 \textcolor{stringliteral}{        came\_from = \{\}}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Variable Documentation}
+\mbox{\Hypertarget{navigation_8py_a1bb42dd4981034c29be5b91bd43546d1}\label{navigation_8py_a1bb42dd4981034c29be5b91bd43546d1}} 
+\index{navigation.py@{navigation.py}!Buffer@{Buffer}}
+\index{Buffer@{Buffer}!navigation.py@{navigation.py}}
+\doxysubsubsection{\texorpdfstring{Buffer}{Buffer}}
+{\footnotesize\ttfamily import rclpy from rclpy node import Node from visualization\+\_\+msgs msg import Marker\+Array from geometry\+\_\+msgs msg import Twist from std\+\_\+msgs msg import Color\+RGBA from nav\+\_\+msgs msg import Occupancy\+Grid import math import heapq from tf2\+\_\+ros import Buffer}
+
+
+
+Definition at line 9 of file navigation.\+py.
+
+\mbox{\Hypertarget{navigation_8py_abd2a69acd647fc87bf2b747f3afc03a8}\label{navigation_8py_abd2a69acd647fc87bf2b747f3afc03a8}} 
+\index{navigation.py@{navigation.py}!g\_score@{g\_score}}
+\index{g\_score@{g\_score}!navigation.py@{navigation.py}}
+\doxysubsubsection{\texorpdfstring{g\_score}{g\_score}}
+{\footnotesize\ttfamily g\+\_\+score}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{= \{index: float(\textcolor{stringliteral}{'inf'}) for index in self.unvisited\}}
+\DoxyCodeLine{        \mbox{\hyperlink{navigation_8py_abd2a69acd647fc87bf2b747f3afc03a8}{g\_score}}[self.start\_index] = 0}
+\DoxyCodeLine{        f\_score = \{index: float(\textcolor{stringliteral}{'inf'}) for index in self.unvisited\}}
+\DoxyCodeLine{        f\_score[self.start\_index] = self.heuristic(self.marker\_positions[self.start\_index], self.marker\_positions[self.goal\_index])}
+\DoxyCodeLine{        }
+\DoxyCodeLine{        while open\_set:}
+\DoxyCodeLine{            \_}
+
+\end{DoxyCode}
+
+
+Definition at line 199 of file navigation.\+py.
+
+\mbox{\Hypertarget{navigation_8py_a5b38a835d801e91f4ad6c42d25ee09af}\label{navigation_8py_a5b38a835d801e91f4ad6c42d25ee09af}} 
+\index{navigation.py@{navigation.py}!Marker@{Marker}}
+\index{Marker@{Marker}!navigation.py@{navigation.py}}
+\doxysubsubsection{\texorpdfstring{Marker}{Marker}}
+{\footnotesize\ttfamily import rclpy from rclpy node import Node from visualization\+\_\+msgs msg import Marker}
+
+
+
+Definition at line 3 of file navigation.\+py.
+
+\mbox{\Hypertarget{navigation_8py_afb1846334569243a90894a2eabd6c93a}\label{navigation_8py_afb1846334569243a90894a2eabd6c93a}} 
+\index{navigation.py@{navigation.py}!Point@{Point}}
+\index{Point@{Point}!navigation.py@{navigation.py}}
+\doxysubsubsection{\texorpdfstring{Point}{Point}}
+{\footnotesize\ttfamily import rclpy from rclpy node import Node from visualization\+\_\+msgs msg import Marker\+Array from geometry\+\_\+msgs msg import Point}
+
+
+
+Definition at line 4 of file navigation.\+py.
+
+\mbox{\Hypertarget{navigation_8py_a7560f79a36d322ffccb5bae2df12dd10}\label{navigation_8py_a7560f79a36d322ffccb5bae2df12dd10}} 
+\index{navigation.py@{navigation.py}!Pose@{Pose}}
+\index{Pose@{Pose}!navigation.py@{navigation.py}}
+\doxysubsubsection{\texorpdfstring{Pose}{Pose}}
+{\footnotesize\ttfamily import rclpy from rclpy node import Node from visualization\+\_\+msgs msg import Marker\+Array from geometry\+\_\+msgs msg import Pose}
+
+
+
+Definition at line 4 of file navigation.\+py.
+

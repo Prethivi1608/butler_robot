@@ -1,0 +1,63 @@
+# Butler Robot Documentation
+
+## Overview
+The Butler Robot is an autonomous service robot designed to navigate and operate in a predefined environment. It utilizes ROS 2, Gazebo, and Nav2 for simulation, mapping, and path planning. The robot can autonomously navigate through a mapped environment with optimized path planning using the A* algorithm.
+
+## System Components
+### 1. Robot Model
+- **File Name**: `Robot.Xacro`
+- The robot model is defined using a Xacro file, which includes its physical and kinematic properties.
+- It is designed to interact with the simulated environment effectively.
+
+### 2. Simulation Environment
+- **File Name**: `french_cafe.world`
+- The Butler Robot operates in a simulated **French Café** environment created in Gazebo.
+- This world contains furniture and obstacles for real-world navigation simulation.
+
+### 3. Mapping the World (SLAM)
+- The world is mapped using **Simultaneous Localization and Mapping (SLAM)**.
+- This enables the robot to generate a map of the environment dynamically and localize itself within it.
+
+### 4. Navigation with Nav2
+- Nav2 is integrated for path planning and autonomous navigation.
+- The robot can receive input commands for goal positions and move efficiently across the mapped environment.
+
+### 5. User Interface
+- **File Name**: `bt.py`
+- This file contains the UI implementation, allowing users to input destinations and navigate the robot.
+- **Launch Command**: `Gazebo_robot.launch.py`
+- This launch file initializes the SLAM, Nav2, and UI components.
+
+## Navigation and Path Planning
+### 1. Navigation System
+- **Source Code File**: `Navigation.py`
+- Implements A* path planning for efficient route optimization.
+- Enhances the robot's ability to avoid obstacles and select optimal paths.
+
+### 2. Launch Files
+- **Gazebo_robot.launch.py**: Launches the simulation with SLAM, Nav2, and UI.
+- **robot_navigation.launch.py**: Used for configuring path planning improvements and navigation algorithms.
+
+### 3. Visualizing Path Planning
+- **Topic**: `/visualisation_markers`
+- Enables visualization of the **grid map** and the **generated path** using markers in RViz.
+- This helps in debugging and optimizing the navigation strategy.
+
+## Running the Simulation
+### Step 1: Launch the Robot in Gazebo
+```bash
+ros2 launch <your_package> Gazebo_robot.launch.py
+```
+### Step 2: Navigate the Robot
+- Use the UI from `bt.py` to send navigation goals.
+- The robot will navigate autonomously using Nav2 and A* path planning.
+
+### Step 3: Visualize the Path
+```bash
+ros2 topic echo /visualisation_markers
+```
+- View the planned path and markers in RViz for analysis.
+
+## Conclusion
+The Butler Robot is a sophisticated autonomous system capable of real-world navigation in a simulated café environment. With robust path planning and user-friendly UI, it serves as an excellent model for service robotics research and development.
+

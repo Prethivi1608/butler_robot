@@ -1,0 +1,108 @@
+\hypertarget{localization__launch_8py}{}\doxysection{src/butler\+\_\+robot/launch/localization\+\_\+launch.py File Reference}
+\label{localization__launch_8py}\index{src/butler\_robot/launch/localization\_launch.py@{src/butler\_robot/launch/localization\_launch.py}}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+import os from ament\+\_\+index\+\_\+python packages import get\+\_\+package\+\_\+share\+\_\+directory from launch import Launch\+Description from launch actions import Set\+Environment\+Variable from launch conditions import If\+Condition from launch substitutions import Python\+Expression from launch\+\_\+ros actions import Load\+Composable\+Nodes from launch\+\_\+ros actions import Node from launch\+\_\+ros descriptions import Parameter\+File from nav2\+\_\+common launch import Rewritten\+Yaml def \mbox{\hyperlink{localization__launch_8py_a5996c75f19494d315ea7aa7c3d0e9d7c}{generate\+\_\+launch\+\_\+description}} ()
+\end{DoxyCompactItemize}
+\doxysubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+import os from ament\+\_\+index\+\_\+python packages import get\+\_\+package\+\_\+share\+\_\+directory from launch import Launch\+Description from launch actions import \mbox{\hyperlink{localization__launch_8py_aaf91d7025aeea2573074f726561b270e}{Declare\+Launch\+Argument}}
+\item 
+import os from ament\+\_\+index\+\_\+python packages import get\+\_\+package\+\_\+share\+\_\+directory from launch import Launch\+Description from launch actions import \mbox{\hyperlink{localization__launch_8py_a0cec0388d139df5d4cbacfe2812dc438}{Group\+Action}}
+\item 
+import os from ament\+\_\+index\+\_\+python packages import get\+\_\+package\+\_\+share\+\_\+directory from launch import Launch\+Description from launch actions import Set\+Environment\+Variable from launch conditions import If\+Condition from launch substitutions import \mbox{\hyperlink{localization__launch_8py_a9397bdbd76c5197b655a9d8b6a277309}{Launch\+Configuration}}
+\item 
+import os from ament\+\_\+index\+\_\+python packages import get\+\_\+package\+\_\+share\+\_\+directory from launch import Launch\+Description from launch actions import Set\+Environment\+Variable from launch conditions import If\+Condition from launch substitutions import Python\+Expression from launch\+\_\+ros actions import Load\+Composable\+Nodes from launch\+\_\+ros actions import Node from launch\+\_\+ros descriptions import \mbox{\hyperlink{localization__launch_8py_a02833fd2f31cd6d27c7d7e9fa47cc6a9}{Composable\+Node}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{localization__launch_8py_a5996c75f19494d315ea7aa7c3d0e9d7c}\label{localization__launch_8py_a5996c75f19494d315ea7aa7c3d0e9d7c}} 
+\index{localization\_launch.py@{localization\_launch.py}!generate\_launch\_description@{generate\_launch\_description}}
+\index{generate\_launch\_description@{generate\_launch\_description}!localization\_launch.py@{localization\_launch.py}}
+\doxysubsubsection{\texorpdfstring{generate\_launch\_description()}{generate\_launch\_description()}}
+{\footnotesize\ttfamily import os from ament\+\_\+index\+\_\+python packages import get\+\_\+package\+\_\+share\+\_\+directory from launch import Launch\+Description from launch actions import Set\+Environment\+Variable from launch conditions import If\+Condition from launch substitutions import Python\+Expression from launch\+\_\+ros actions import Load\+Composable\+Nodes from launch\+\_\+ros actions import Node from launch\+\_\+ros descriptions import Parameter\+File from nav2\+\_\+common launch import Rewritten\+Yaml def generate\+\_\+launch\+\_\+description (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line 29 of file localization\+\_\+launch.\+py.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{29                                  :}
+\DoxyCodeLine{30 \textcolor{preprocessor}{    \# Get the launch directory}}
+\DoxyCodeLine{31     bringup\_dir = get\_package\_share\_directory(\textcolor{stringliteral}{'butler\_robot'})}
+\DoxyCodeLine{32 }
+\DoxyCodeLine{33     namespace = \mbox{\hyperlink{localization__launch_8py_a9397bdbd76c5197b655a9d8b6a277309}{LaunchConfiguration}}('namespace')}
+\DoxyCodeLine{34     map\_yaml\_file = \mbox{\hyperlink{localization__launch_8py_a9397bdbd76c5197b655a9d8b6a277309}{LaunchConfiguration}}('map')}
+\DoxyCodeLine{35     use\_sim\_time = \mbox{\hyperlink{localization__launch_8py_a9397bdbd76c5197b655a9d8b6a277309}{LaunchConfiguration}}('use\_sim\_time')}
+\DoxyCodeLine{36     autostart = \mbox{\hyperlink{localization__launch_8py_a9397bdbd76c5197b655a9d8b6a277309}{LaunchConfiguration}}('autostart')}
+\DoxyCodeLine{37     params\_file = \mbox{\hyperlink{localization__launch_8py_a9397bdbd76c5197b655a9d8b6a277309}{LaunchConfiguration}}('params\_file')}
+\DoxyCodeLine{38     use\_composition = \mbox{\hyperlink{localization__launch_8py_a9397bdbd76c5197b655a9d8b6a277309}{LaunchConfiguration}}('use\_composition')}
+\DoxyCodeLine{39     container\_name = \mbox{\hyperlink{localization__launch_8py_a9397bdbd76c5197b655a9d8b6a277309}{LaunchConfiguration}}('container\_name')}
+\DoxyCodeLine{40     container\_name\_full = (namespace, '/', container\_name)}
+\DoxyCodeLine{41     use\_respawn = \mbox{\hyperlink{localization__launch_8py_a9397bdbd76c5197b655a9d8b6a277309}{LaunchConfiguration}}('use\_respawn')}
+\DoxyCodeLine{42     log\_level = \mbox{\hyperlink{localization__launch_8py_a9397bdbd76c5197b655a9d8b6a277309}{LaunchConfiguration}}('log\_level')}
+\DoxyCodeLine{43 }
+\DoxyCodeLine{44     lifecycle\_nodes = ['map\_server', 'amcl']}
+\DoxyCodeLine{45 }
+\DoxyCodeLine{46     \textcolor{preprocessor}{\# Map fully qualified names to relative ones so the node's namespace can be prepended.}}
+\DoxyCodeLine{47 \textcolor{preprocessor}{    \# In case of the transforms (tf), currently, there doesn't seem to be a better alternative}}
+\DoxyCodeLine{48 \textcolor{preprocessor}{    \# https:}\textcolor{comment}{//github.com/ros/geometry2/issues/32}}
+\DoxyCodeLine{49 \textcolor{preprocessor}{    \# https:}\textcolor{comment}{//github.com/ros/robot\_state\_publisher/pull/30}}
+\DoxyCodeLine{50 \textcolor{preprocessor}{    \# TODO(orduno) Substitute with `PushNodeRemapping`}}
+\DoxyCodeLine{51 \textcolor{preprocessor}{    \#              https:}\textcolor{comment}{//github.com/ros2/launch\_ros/issues/56}}
+\DoxyCodeLine{52     remappings = [(\textcolor{stringliteral}{'/tf'}, \textcolor{stringliteral}{'tf'}),}
+\DoxyCodeLine{53                   (\textcolor{stringliteral}{'/tf\_static'}, \textcolor{stringliteral}{'tf\_static'})]}
+\DoxyCodeLine{54 }
+\DoxyCodeLine{55 \textcolor{preprocessor}{    \# Create our own temporary YAML files that include substitutions}}
+\DoxyCodeLine{56     param\_substitutions = \{}
+\DoxyCodeLine{57         \textcolor{stringliteral}{'use\_sim\_time'}: use\_sim\_time,}
+\DoxyCodeLine{58         \textcolor{stringliteral}{'yaml\_filename'}: map\_yaml\_file\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Variable Documentation}
+\mbox{\Hypertarget{localization__launch_8py_a02833fd2f31cd6d27c7d7e9fa47cc6a9}\label{localization__launch_8py_a02833fd2f31cd6d27c7d7e9fa47cc6a9}} 
+\index{localization\_launch.py@{localization\_launch.py}!ComposableNode@{ComposableNode}}
+\index{ComposableNode@{ComposableNode}!localization\_launch.py@{localization\_launch.py}}
+\doxysubsubsection{\texorpdfstring{ComposableNode}{ComposableNode}}
+{\footnotesize\ttfamily import os from ament\+\_\+index\+\_\+python packages import get\+\_\+package\+\_\+share\+\_\+directory from launch import Launch\+Description from launch actions import Set\+Environment\+Variable from launch conditions import If\+Condition from launch substitutions import Python\+Expression from launch\+\_\+ros actions import Load\+Composable\+Nodes from launch\+\_\+ros actions import Node from launch\+\_\+ros descriptions import Composable\+Node}
+
+
+
+Definition at line 25 of file localization\+\_\+launch.\+py.
+
+\mbox{\Hypertarget{localization__launch_8py_aaf91d7025aeea2573074f726561b270e}\label{localization__launch_8py_aaf91d7025aeea2573074f726561b270e}} 
+\index{localization\_launch.py@{localization\_launch.py}!DeclareLaunchArgument@{DeclareLaunchArgument}}
+\index{DeclareLaunchArgument@{DeclareLaunchArgument}!localization\_launch.py@{localization\_launch.py}}
+\doxysubsubsection{\texorpdfstring{DeclareLaunchArgument}{DeclareLaunchArgument}}
+{\footnotesize\ttfamily import os from ament\+\_\+index\+\_\+python packages import get\+\_\+package\+\_\+share\+\_\+directory from launch import Launch\+Description from launch actions import Declare\+Launch\+Argument}
+
+
+
+Definition at line 20 of file localization\+\_\+launch.\+py.
+
+\mbox{\Hypertarget{localization__launch_8py_a0cec0388d139df5d4cbacfe2812dc438}\label{localization__launch_8py_a0cec0388d139df5d4cbacfe2812dc438}} 
+\index{localization\_launch.py@{localization\_launch.py}!GroupAction@{GroupAction}}
+\index{GroupAction@{GroupAction}!localization\_launch.py@{localization\_launch.py}}
+\doxysubsubsection{\texorpdfstring{GroupAction}{GroupAction}}
+{\footnotesize\ttfamily import os from ament\+\_\+index\+\_\+python packages import get\+\_\+package\+\_\+share\+\_\+directory from launch import Launch\+Description from launch actions import Group\+Action}
+
+
+
+Definition at line 20 of file localization\+\_\+launch.\+py.
+
+\mbox{\Hypertarget{localization__launch_8py_a9397bdbd76c5197b655a9d8b6a277309}\label{localization__launch_8py_a9397bdbd76c5197b655a9d8b6a277309}} 
+\index{localization\_launch.py@{localization\_launch.py}!LaunchConfiguration@{LaunchConfiguration}}
+\index{LaunchConfiguration@{LaunchConfiguration}!localization\_launch.py@{localization\_launch.py}}
+\doxysubsubsection{\texorpdfstring{LaunchConfiguration}{LaunchConfiguration}}
+{\footnotesize\ttfamily import os from ament\+\_\+index\+\_\+python packages import get\+\_\+package\+\_\+share\+\_\+directory from launch import Launch\+Description from launch actions import Set\+Environment\+Variable from launch conditions import If\+Condition from launch substitutions import Launch\+Configuration}
+
+
+
+Definition at line 22 of file localization\+\_\+launch.\+py.
+
