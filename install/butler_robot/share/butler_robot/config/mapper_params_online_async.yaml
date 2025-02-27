@@ -12,14 +12,14 @@ slam_toolbox:
     # ROS Parameters
     odom_frame: odom
     map_frame: map
-    base_frame: base_footprint
+    base_frame: base_link
     scan_topic: /scan
-    mode: localization #mapping  
+    mode: localization  #mapping  
 
     # if you'd like to immediately start continuing a map at a given pose
     # or at the dock, but they are mutually exclusive, if pose is given
     # will use pose
-    map_file_name: /home/prethiviraj/butler_robot/cafe3_serial
+    map_file_name: /home/prethiviraj/butler_robot/Cafe1_Save
     # map_start_pose: [0.0, 0.0, 0.0]
     map_start_at_dock: true
 

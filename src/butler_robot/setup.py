@@ -28,6 +28,7 @@ setup(
         'console_scripts': [
             'goal_publisher = butler_robot.navigation:main',
             'bt = butler_robot.bt:main',
+            'debug = butler_robot.debug:main',
         ],
     },
 )

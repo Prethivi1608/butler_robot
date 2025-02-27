@@ -89,17 +89,17 @@ def generate_launch_description():
     static_transformNode = Node(
             package="tf2_ros",
             executable="static_transform_publisher",
-            arguments=["0", "0", "0", "0", "0", "0", "map", "base_link"],
+            arguments=["0", "0", "0", "0", "0", "0", "map", "base_footprint"],
             output="screen"
     )
     
 
     launchDescriptionObject = LaunchDescription()
 
-    launchDescriptionObject.add_action(static_transformNode)
+    #launchDescriptionObject.add_action(static_transformNode)
     
     launchDescriptionObject.add_action(bringup_launch)
-
+    
     launchDescriptionObject.add_action(rviz_Node)
 
     launchDescriptionObject.add_action(gazeboLaunch)
@@ -110,7 +110,8 @@ def generate_launch_description():
 
     launchDescriptionObject.add_action(slam_launch)
     
-    launchDescriptionObject.add_action(Ui_Node)
+    
+    #launchDescriptionObject.add_action(Ui_Node)
 
 
     return launchDescriptionObject

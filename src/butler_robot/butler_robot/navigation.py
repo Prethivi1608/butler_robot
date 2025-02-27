@@ -57,7 +57,7 @@ class MarkerPublisher(Node):
     
     def get_initial_robot_position(self):
         try:
-            transform = self.tf_buffer.lookup_transform('map', 'base_footprint', rclpy.time.Time())
+            transform = self.tf_buffer.lookup_transform('map', 'base_link', rclpy.time.Time())
             
             # Extract the robot's position (x, y)
             self.start_x = transform.transform.translation.x
@@ -80,7 +80,7 @@ class MarkerPublisher(Node):
 
     def get_robot_position(self):
         try:
-            transform: TransformStamped = self.tf_buffer.lookup_transform('map', 'base_footprint', rclpy.time.Time())
+            transform: TransformStamped = self.tf_buffer.lookup_transform('map', 'base_link', rclpy.time.Time())
             
             # Extract the robot's position in the map frame
             self.start_x = transform.transform.translation.x
@@ -280,17 +280,6 @@ class MarkerPublisher(Node):
                 self.cmd_vel_pub.publish(move_cmd)
                 
                 self.get_logger().info(f"Moving to point: ({target_point.x}, {target_point.y})")
-
-    def get_robot_position(self):
-        try:
-            transform: TransformStamped = self.tf_buffer.lookup_transform('map', 'base_footprint', rclpy.time.Time())
-            
-            # Extract the robot's position in the map frame
-            return transform.transform.translation
-            
-        except Exception as e:
-            self.get_logger().error(f"Could not get transform: {e}")
-            return Point()
 
 def main(args=None):
     rclpy.init(args=args)
