@@ -1,148 +1,93 @@
+import os
 import rclpy
 from rclpy.node import Node
-from geometry_msgs.msg import Twist
-from sensor_msgs.msg import Imu
-from tf2_ros import Buffer, TransformListener
-import math
-from tf_transformations import euler_from_quaternion
-import time
+from geometry_msgs.msg import Twist, PoseStamped, TransformStamped
+import rclpy.time
+from tf2_ros import TransformListener, Buffer 
 import tkinter as tk
-from tkinter import messagebox
 from threading import Thread
+import time
+from tkinter import messagebox
 from time import sleep
 
-class RobotMovement(Node):
+class Movebase(Node):
     def __init__(self):
-        super().__init__('robot_movement')
+        super().__init__('move_robot')
+        self.moveforward = self.create_publisher(Twist,'/cmd_vel',1)
+        self.timer = self.create_timer(1,self.forward_callback)
+        
+        
+    def forward_callback(self):
+        self.speed =  Twist()
+        self.speed.linear.x = 1.0
+        self.speed.angular.z = 1.5 
+        self.get_logger().info('Publishing to the topic. Robot Moving')
+        self.moveforward.publish(self.speed)      
+        
 
-        # Positions of destinations (home will be set dynamically)
-        self.kitchen_x, self.kitchen_y = -25.0746, -11.4507
-        self.table1_x, self.table1_y = 22.0289, -20.9113
-        self.table2_x, self.table2_y = 14.6836, -20.8355
-        self.table3_x, self.table3_y = 19.0407, -4.63315
+class RobotPose(Node):
+    def __init__(self):
+        super().__init__('listener')
+        
+    
+        
 
-        self.goal_x, self.goal_y = None, None
+class Butler_Robot(Node):
+    def __init__(self):
+        super().__init__('go_to_goal')
+        
+        self.kitchen_x = -24.4204 
+        self.kitchen_y = -0.051482
+        self.table1_x = 17.0289
+        self.table1_y = 17.9113
+        self.table2_x = 10.6836
+        self.table2_y = -13.8355
+        self.table3_x = 17.0407
+        self.table3_y = -3.63315
+        self.home_x = 0
+        self.home_y = 0
+        
         self.is_order_cancelled = False
         self.confirmation_received = False
-
-        self.cmd_vel_pub = self.create_publisher(Twist, '/cmd_vel', 10)
-        self.create_timer(1.0, self.check_status)
-
-        self.get_logger().info("RobotMovement Node has started.")
-
-        # Initialize tf2 for transform lookup
-        self.tf_buffer = Buffer()
-        self.tf_listener = TransformListener(self.tf_buffer, self)
         
-        # IMU Subscriber
-        self.imu_sub = self.create_subscription(Imu, '/imu/data', self.imu_callback, 10)
-        self.current_yaw = 0.0
-
-        # Wait for initial robot pose and dynamically set home position
-        self.current_x, self.current_y = 0.0, 0.0
-        self.wait_for_robot_pose()
-
-    def imu_callback(self, msg):
-        orientation = msg.orientation
-        (_, _, yaw) = euler_from_quaternion([orientation.x, orientation.y, orientation.z, orientation.w])
-        self.current_yaw = yaw  # Update robot's yaw angle
+        self.buffer = Buffer()
+        self.listener = TransformListener(self.buffer,self)
+        self.timer = self.create_timer(1,self.robot_pose)
+        
+        
+        self.goal_pose = self.create_publisher(PoseStamped,'/goal_pose',10)
+        # self.timer = self.create_timer(200,self.send_goal())
+        
     
-    def wait_for_robot_pose(self):
-        while not self.get_robot_pose():
-            self.get_logger().info("Waiting for robot pose data...")
-            sleep(1)
-
-        # Dynamically set home position from first retrieved pose
-        self.home_x, self.home_y = self.current_x, self.current_y
-        self.get_logger().info(f"Home position set dynamically: ({self.home_x}, {self.home_y})")
-
-    def get_robot_pose(self):
-        try:
-            transform = self.tf_buffer.lookup_transform('map', 'base_link', rclpy.time.Time())
-            self.current_x = transform.transform.translation.x
-            self.current_y = transform.transform.translation.y
-            self.get_logger().info(f"Robot Pose: {self.current_x}, {self.current_y}, {self.current_yaw}")
-            return True
-        except Exception as e:
-            self.get_logger().warn(f"Error getting robot pose: {str(e)}")
-            return False
-
-    def move_to_goal(self, x, y):
-        while self.get_robot_pose():  # Continuously update position
-            delta_x = x - self.current_x
-            delta_y = y - self.current_y
-            goal_angle = math.atan2(delta_y, delta_x)
-            angle_diff = goal_angle - self.current_yaw
-            angle_diff = (angle_diff + math.pi) % (2 * math.pi) - math.pi
-
-            twist = Twist()
-            twist.angular.z = 0.5 * angle_diff
-            if abs(angle_diff) < 0.1:
-                twist.angular.z = 0.0
-                twist.linear.x = 1.5
-
-            self.cmd_vel_pub.publish(twist)
-
-            distance_to_goal = math.sqrt(delta_x ** 2 + delta_y ** 2)
-            if distance_to_goal < 0.1:
-                break
-            sleep(0.1)
-
-        twist.linear.x = 0.0
-        twist.angular.z = 0.0
-        self.cmd_vel_pub.publish(twist)
-        self.get_logger().info(f"Robot has arrived at goal ({x}, {y})")
-
-    def move_to_kitchen(self):
-        self.move_to_goal(self.kitchen_x, self.kitchen_y)
-
-    def move_to_home(self):
-        self.move_to_goal(self.home_x, self.home_y)
-
-    def confirm_delivery(self):
-        start_time = time.time()
-        user_confirm = messagebox.askyesno("Confirmation", "Please confirm in Kitchen?")
-
-        while time.time() - start_time < 60:
-            if user_confirm:
-                self.confirmation_received = True
-                messagebox.showinfo("Delivery Status", "Order completed successfully.")
-                return
-            sleep(1)
-
-        self.confirmation_received = False
-        messagebox.showinfo("Delivery Status", "Order not completed. Returning to home.")
-        self.move_to_home()
-
-    def set_goal(self, goal_name):
-        goals = {"Table1": (self.table1_x, self.table1_y),
-                 "Table2": (self.table2_x, self.table2_y),
-                 "Table3": (self.table3_x, self.table3_y)}
-
-        if goal_name not in goals:
-            messagebox.showerror("Invalid Goal", "Invalid goal selected.")
-            return
-
-        self.goal_x, self.goal_y = goals[goal_name]
-        self.move_to_kitchen()
-        sleep(5)
-        self.confirm_delivery()
-
-        if self.confirmation_received:
-            self.move_to_goal(self.goal_x, self.goal_y)
-
-    def cancel_order(self):
-        self.is_order_cancelled = True
-        self.get_logger().info("Order has been cancelled.")
-        self.move_to_kitchen()
-        self.move_to_home()
-        messagebox.showinfo("Order Cancelled", "The order has been cancelled. Returning to home.")
-
-    def check_status(self):
-        if self.is_order_cancelled:
-            self.move_to_home()
-            self.is_order_cancelled = False
-
+        
+    def robot_pose(self):
+        self.transform = TransformStamped()
+        self.transform = self.buffer.lookup_transform('map','base_link',rclpy.time.Time())
+        
+        self.current_x = self.transform.transform.translation.x
+        self.current_y = self.transform.transform.translation.y
+        self.current_z = self.transform.transform.translation.z
+        
+        
+        self.get_logger().info(f'Robot Position : x :{self.current_x},y: {self.current_y}, z:{self.current_z}')
+        
+    
+    def send_goal(self,goal_x,goal_y):
+        self.goal_msg = PoseStamped()
+        self.goal_msg.header.frame_id = 'map'
+        self.goal_msg.header.stamp = self.get_clock().now().to_msg()
+        self.goal_x = goal_x
+        self.goal_y = goal_y
+        
+        
+        self.goal_msg.pose.position.x = self.goal_x
+        self.goal_msg.pose.position.y = self.goal_y
+        
+        
+        self.goal_pose.publish(self.goal_msg)
+        self.get_logger().info('Published goal')
+        
+        
     def start_gui(self):
         def gui_thread():
             root = tk.Tk()
@@ -155,15 +100,77 @@ class RobotMovement(Node):
             tk.Button(root, text="Quit", command=root.quit).pack(pady=20)
             root.mainloop()
         Thread(target=gui_thread).start()
+        
+    def set_goal(self, goal_name):
+        goals = {"Table1": (self.table1_x, self.table1_y),
+                 "Table2": (self.table2_x, self.table2_y),
+                 "Table3": (self.table3_x, self.table3_y)}
 
+        if goal_name not in goals:
+            messagebox.showerror("Invalid Goal", "Invalid goal selected.")
+            return
 
-def main(args=None):
-    rclpy.init(args=args)
-    robot_movement = RobotMovement()
-    robot_movement.start_gui()
-    rclpy.spin(robot_movement)
-    robot_movement.destroy_node()
+        self.goal_x, self.goal_y = goals[goal_name]
+        self.move_to_kitchen()
+        if self.has_reached_goal(self.kitchen_x, self.kitchen_y):
+            self.confirm_delivery()
+            
+    def has_reached_goal(self, reach_x,reach_y):
+        distance_to_x = reach_x - self.current_x
+        distance_to_y = reach_y - self.current_y
+        
+        if distance_to_x and distance_to_y < 5:
+            self.get_logger().info('Goal has been reached.')
+            return True
+
+    
+    def move_to_kitchen(self):
+        self.send_goal(self.kitchen_x, self.kitchen_y)
+
+    def move_to_home(self):
+        self.send_goal(self.home_x, self.home_y)
+    
+    def cancel_order(self):
+        self.is_order_cancelled = True
+        self.get_logger().info("Order has been cancelled.")
+        self.move_to_kitchen()
+        self.move_to_home()
+        messagebox.showinfo("Order Cancelled", "The order has been cancelled. Returning to home.")
+
+        
+    def confirm_delivery(self):
+        start_time = time.time()
+        user_confirm = messagebox.askyesno("Confirmation", "Please confirm in Kitchen?")
+
+        while time.time() - start_time < 60:
+            if user_confirm:
+                self.confirmation_received = True
+                messagebox.showinfo("Going to the Table")
+                self.send_goal(self.goal_x, self.goal_y)
+                if self.has_reached_goal(self.goal_x, self.goal_y):
+                    self.get_logger().info('Ordered Delivered Successfully. Returning to Home')
+                    self.move_to_home() 
+                return
+            sleep(1)
+
+        self.confirmation_received = False
+        messagebox.showinfo("Delivery Status", "Order not completed. Returning to home.")
+        self.move_to_home()
+        
+        
+        
+def main(): 
+    rclpy.init()
+    #move_robot = Movebase()
+
+    
+    go_to_goal = Butler_Robot()
+    go_to_goal.start_gui()
+    
+    rclpy.spin(go_to_goal)
+    go_to_goal.destroy_node()
     rclpy.shutdown()
+    
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

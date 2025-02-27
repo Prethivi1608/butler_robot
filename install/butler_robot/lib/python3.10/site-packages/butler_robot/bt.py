@@ -26,7 +26,7 @@ class RobotMovement(Node):
         self.confirmation_received = False
 
         self.cmd_vel_pub = self.create_publisher(Twist, '/cmd_vel', 10)
-        self.create_timer(1.0, self.check_status)
+        self.create_timer(0.0, self.check_status)
 
         self.get_logger().info("RobotMovement Node has started.")
 
