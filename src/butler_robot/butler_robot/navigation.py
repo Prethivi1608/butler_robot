@@ -92,9 +92,7 @@ class MarkerPublisher(Node):
             self.get_logger().error(f"Could not get transform: {e}")
 
     def get_index_from_position(self, x, y):
-        """
-        Convert x, y coordinates to the corresponding index in the grid.
-        """
+  
         i = int((x - self.origin.x) / self.resolution / self.spacing)
         j = int((y - self.origin.y) / self.resolution / self.spacing)
         index = j * 120 + i
@@ -223,9 +221,7 @@ class MarkerPublisher(Node):
                     heapq.heappush(open_set, (f_score[neighbor], neighbor))
         
     def get_coords_from_index(self, index):
-        """
-        Convert grid index to (i, j) coordinates.
-        """
+  
         i = index % 120
         j = index // 120
         return i, j
@@ -248,9 +244,7 @@ class MarkerPublisher(Node):
         self.marker_array.markers.append(smoothened_path_marker)
 
     def smooth_path(self, path_points):
-        """
-        Simple smoothing of the path by averaging adjacent points.
-        """
+
         smoothened_path = [path_points[0]]  # Keep the start point
         
         for i in range(1, len(path_points) - 1):
