@@ -36,7 +36,7 @@ class Butler_Robot(Node):
     def __init__(self):
         super().__init__('go_to_goal')
         
-        self.kitchen_x = -24.4204 
+        self.kitchen_x = -28.4204 
         self.kitchen_y = -0.051482
         self.table1_x = 17.0289
         self.table1_y = 17.9113
@@ -93,34 +93,52 @@ class Butler_Robot(Node):
             root = tk.Tk()
             root.title("Robot Goal Selection")
             tk.Label(root, text="Please select a goal destination:").pack(pady=10)
-            tk.Button(root, text="Table1", command=lambda: self.set_goal("Table1")).pack(pady=5)
-            tk.Button(root, text="Table2", command=lambda: self.set_goal("Table2")).pack(pady=5)
-            tk.Button(root, text="Table3", command=lambda: self.set_goal("Table3")).pack(pady=5)
+            tk.Button(root, text="Table1", command=self.move_to_table1).pack(pady=5)
+            tk.Button(root, text="Table2", command=self.move_to_table2).pack(pady=5)
+            tk.Button(root, text="Table3", command=self.move_to_table3).pack(pady=5)
             tk.Button(root, text="Cancel Order", command=self.cancel_order).pack(pady=5)
             tk.Button(root, text="Quit", command=root.quit).pack(pady=20)
             root.mainloop()
         Thread(target=gui_thread).start()
-        
-    def set_goal(self, goal_name):
-        goals = {"Table1": (self.table1_x, self.table1_y),
-                 "Table2": (self.table2_x, self.table2_y),
-                 "Table3": (self.table3_x, self.table3_y)}
-
-        if goal_name not in goals:
-            messagebox.showerror("Invalid Goal", "Invalid goal selected.")
-            return
-
-        self.goal_x, self.goal_y = goals[goal_name]
+            
+    def move_to_table1(self):
+        self.get_logger().info('Moving to Table1.')
         self.move_to_kitchen()
         if self.has_reached_goal(self.kitchen_x, self.kitchen_y):
             self.confirm_delivery()
-            
+        if self.confirmation_received == True:
+            self.send_goal(self.table1_x, self.table1_y)
+            if self.has_reached_goal(self.table1_x, self.table1_y) == True:
+                self.get_logger().info('Goal has been reached.')
+                self.move_to_home()
+    
+    
+    def move_to_table2(self):
+        self.move_to_kitchen()
+        if self.has_reached_goal(self.kitchen_x, self.kitchen_y):
+            self.confirm_delivery()
+        if self.confirmation_received == True:
+            self.send_goal(self.table2_x, self.table2_y)
+            if self.has_reached_goal(self.table2_x, self.table2_y) == True:
+                self.get_logger().info('Goal has been reached.')
+                self.move_to_home()
+        
+    def move_to_table3(self):
+        self.move_to_kitchen()
+        if self.has_reached_goal(self.kitchen_x, self.kitchen_y):
+            self.confirm_delivery()
+        if self.confirmation_received == True:
+            self.send_goal(self.table3_x, self.table3_y)
+            if self.has_reached_goal(self.table3_x, self.table3_y) == True:
+                self.get_logger().info('Goal has been reached.')
+                self.move_to_home()
+        
+
     def has_reached_goal(self, reach_x,reach_y):
         distance_to_x = reach_x - self.current_x
         distance_to_y = reach_y - self.current_y
         
         if distance_to_x and distance_to_y < 5:
-            self.get_logger().info('Goal has been reached.')
             return True
 
     
@@ -146,10 +164,6 @@ class Butler_Robot(Node):
             if user_confirm:
                 self.confirmation_received = True
                 messagebox.showinfo("Going to the Table")
-                self.send_goal(self.goal_x, self.goal_y)
-                if self.has_reached_goal(self.goal_x, self.goal_y):
-                    self.get_logger().info('Ordered Delivered Successfully. Returning to Home')
-                    self.move_to_home() 
                 return
             sleep(1)
 
@@ -174,3 +188,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+    
+    
