@@ -29,6 +29,7 @@ setup(
             'goal_publisher = butler_robot.navigation:main',
             'bt = butler_robot.bt:main',
             'debug = butler_robot.debug:main',
+            'image_save = butler_robot.image_save:main',
         ],
     },
 )

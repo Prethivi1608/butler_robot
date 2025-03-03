@@ -11,6 +11,7 @@ setup.py
 butler_robot/__init__.py
 butler_robot/bt.py
 butler_robot/debug.py
+butler_robot/image_save.py
 butler_robot/navigation.py
 butler_robot/robot_movement.py
 launch/gazebo_robot.launch.py
